@@ -1,0 +1,18 @@
+model:
+  name: MLP
+  multi_omics: False
+  params:
+    input_dim: 1
+    dropout: 0.3
+    batch_norm: True
+    layer_norm: True
+
+optim: 
+  optimizer: Adam
+  lr: 0.01
+  lr_decay: 0
+  weight_decay: 0.01
+
+training:
+  n_epochs: 1000
+  batch_size: 30

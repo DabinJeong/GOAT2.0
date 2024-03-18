@@ -1,0 +1,106 @@
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import dgl.function as f
+
+def src_dot_dst(src_field, dst_field, out_field):
+    def func(edges):
+        return {out_field: (edges.src[src_field] * edges.dst[dst_field])}
+    return func
+
+def scaled_exp(field, scale_constant):
+    def func(edges):
+        # clamp for softmax numerical stability
+        return {field: torch.exp((edges.data[field] / scale_constant).clamp(-5, 5))}
+    return func
+
+class MultiHeadAttentionLayer(nn.Module):
+    def __init__(self, in_dim, out_dim, num_heads, use_bias):
+        super().__init__()
+
+        self.in_dim = in_dim
+        self.out_dim = out_dim
+        self.num_heads = num_heads
+        self.head_dim = self.out_dim // num_heads
+
+        if use_bias:
+            self.Q = nn.Linear(in_dim, out_dim, bias=True)
+            self.K = nn.Linear(in_dim, out_dim, bias=True)
+            self.V = nn.Linear(in_dim, out_dim, bias=True)
+        else:
+            self.Q = nn.Linear(in_dim, out_dim, bias=False)
+            self.K = nn.Linear(in_dim, out_dim, bias=False)
+            self.V = nn.Linear(in_dim, out_dim, bias=False)
+
+    def propagate_attention(self,g):
+        # Calculate attention score 
+        ## query * key score 
+        g.apply_edges(src_dot_dst('K_h','Q_h','score'))
+        g.apply_edges(scaled_exp('score', np.sqrt(self.head_dim)))
+
+        eids = g.edges()
+        ## Attention: message passing V_h = V_h * score to update value, then sum up values across attention heads -> 'A'
+        g.send_and_recv(eids, f.u_mul_e('V_h', 'score', 'V_h'), f.sum('V_h', 'A')) 
+        ## sum up query-key scores of neighboring nodes for softmax -> 'z'
+        g.send_and_recv(eids, f.copy_e('score', 'score'), f.sum('score', 'z'))
+
+    def forward(self, g, h):
+        with g.local_scope():
+            Q_h = self.Q(h)
+            K_h = self.K(h)
+            V_h = self.V(h)
+
+            # Add hidden layer to dgl graph
+            g.ndata['Q_h'] = Q_h.view(-1, self.num_heads, self.head_dim)
+            g.ndata['K_h'] = K_h.view(-1, self.num_heads, self.head_dim)
+            g.ndata['V_h'] = V_h.view(-1, self.num_heads, self.head_dim)
+
+            self.propagate_attention(g)
+
+            head_out = g.ndata['A'] / g.ndata['z']
+            head_out = torch.nan_to_num(head_out)
+
+        return head_out
+    
+class GraphTransformerLayer(nn.Module):
+    def __init__(self, in_dim, out_dim, num_heads, dropout, residual, batch_norm, layer_norm):
+        super().__init__()
+        self.in_dim = in_dim
+        self.out_dim = out_dim
+        self.num_heads = num_heads
+        self.dropout = dropout
+        self.residual = residual
+        self.batch_norm = batch_norm
+        self.layer_norm = layer_norm
+
+        self.attention = MultiHeadAttentionLayer(in_dim, out_dim, num_heads, use_bias=True)
+        self.out = nn.Linear(out_dim, out_dim)
+
+        if self.layer_norm:
+            self.layer_norm1 = nn.LayerNorm(out_dim)
+        if self.batch_norm:
+            self.batch_norm1 = nn.BatchNorm1d(out_dim) 
+
+        self.FFN1 = nn.Linear(out_dim, out_dim // 2)
+
+        self.dropout_layer = nn.Dropout(p=dropout)
+        
+    def forward(self, g, h):
+        with g.local_scope():
+            h_res = h
+            attn_out = self.attention(g, h)
+            h = attn_out.view(-1, self.out_dim)
+            h = F.dropout(h, self.dropout)
+            h = self.out(h)
+
+            if self.residual:
+                h = h + h_res
+            if self.layer_norm:
+                h = self.layer_norm1(h)
+            if self.batch_norm:
+                h = self.batch_norm1(h)
+
+        return h
+
+
