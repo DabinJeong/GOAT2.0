@@ -1,5 +1,5 @@
 # GOAT 2.0
-More extensive and easily applicable deep graph attention mdeol for multi-omics biomarker discovery.
+More extensive and easily applicable deep graph attention model for multi-omics biomarker discovery.
 Original manuscript available [**here**](https://academic.oup.com/bioinformatics/article/39/10/btad582/7280697).
 
 ## Installation
