@@ -27,8 +27,6 @@ def test(args):
 
     model_name = config.get("model.name")
 
-    print(model_name)
-
     outDir = args.outDir
     if os.path.exists(outDir) == False:
         os.makedirs(outDir)
