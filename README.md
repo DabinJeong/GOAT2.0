@@ -1,6 +1,6 @@
 # GOAT 2.0
 More extensive and easily applicable deep graph attention mdeol for multi-omics biomarker discovery.
-Original manuscript (2023, Bioinformatics) available [**here**](https://academic.oup.com/bioinformatics/article/39/10/btad582/7280697)
+Original manuscript available [**here**](https://academic.oup.com/bioinformatics/article/39/10/btad582/7280697).
 
 ## Installation
 ~~~
