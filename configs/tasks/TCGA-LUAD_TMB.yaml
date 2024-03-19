@@ -2,9 +2,10 @@ data:
   multi_omics: True
   name: TCGA-LUAD_TMB
   data_split_file: /Users/dabin1816/dabin/GOAT2.0/datasets/data_splits/TCGA-lung-LUAD-TMB-pan_cancer-13_gdc_split0.csv
-  path: /Users/dabin1816/dabin/GOAT2.0/datasets/TCGA-LUAD_oncogenes_split0/
+  path: /Users/dabin1816/dabin/GOAT2.0/datasets/TCGA-LUAD_tumor_suppressor_genes_split0/
   gene_network: /Users/dabin1816/dabin/GOAT2.0/datasets/STRING_human_geneSymbol_confidenceFilt900.tsv
   gene_list: /Users/dabin1816/dabin/GOAT2.0/datasets/tumor_suppressor_genes.txt
-  transcriptome_data: /Users/dabin1816/dabin/GOAT2.0/datasets/TCGA-LUAD_oncogenes_split0/TPM_logP_all_samples_TCGA-LUAD_filt.tsv
-  proteome_data: /Users/dabin1816/dabin/GOAT2.0/datasets/TCGA-LUAD_oncogenes_split0/PeptideIntensity_all_samples_TCGA-LUAD.tsv
-  patient_label: /Users/dabin1816/dabin/GOAT2.0/datasets/TCGA-LUAD_oncogenes_split0/Patient_TMB_label_TCGA-LUAD.csv
+  omics_data:
+    transcriptome_data: /Users/dabin1816/dabin/GOAT2.0/datasets/TCGA-LUAD_tumor_suppressor_genes_split0/TPM_TCGA-LUAD.merged.logP_norm.tsv
+    proteome_data: /Users/dabin1816/dabin/GOAT2.0/datasets/TCGA-LUAD_tumor_suppressor_genes_split0/PeptideIntensity_all_samples_TCGA-LUAD.tsv
+  patient_label: /Users/dabin1816/dabin/GOAT2.0/datasets/TCGA-LUAD_tumor_suppressor_genes_split0/Patient_TMB_label_TCGA-LUAD.csv

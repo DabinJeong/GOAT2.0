@@ -8,10 +8,10 @@ import argparse
 
 # ======== Prepare dataset ======== 
 def prepare_dataset(config, multi_omics=False):
-    exp_file = glob(config.data.path+'TPM_*')[0]
+    exp_file = glob(config.data.path+'transcriptome_*')[0]
     exp_df = pd.read_csv(exp_file,sep='\t',index_col=0)
 
-    prot_file = glob(config.data.path+'PeptideIntensity*')[0]
+    prot_file = glob(config.data.path+'proteome_*')[0]
     prot_df = pd.read_csv(prot_file,sep='\t',index_col=0)
 
     patient_id_file = glob(config.data.path+'Patient_label_*')[0]
@@ -45,8 +45,6 @@ def prepare_dataset(config, multi_omics=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-gene_network")
-    parser.add_argument("-gene_list")
     parser.add_argument("-taskConfig")
     args = parser.parse_args()
     config_dataset = ConfigDict(yaml.load(open(args.taskConfig,'r'), yaml.FullLoader))
@@ -55,13 +53,20 @@ if __name__ == "__main__":
     with open(config_dataset.data.gene_list) as f:
         gene_list = f.read().strip().split('\n')
 
-    gene_network_filt = gene_network.loc[lambda x:np.isin(x.protein1, gene_list) & np.isin(x.protein2, gene_list), :]
-    G = nx.from_pandas_edgelist(gene_network, source='protein1', target='protein2', edge_attr=True)
+    gene_network_filt = gene_network.loc[lambda x:np.logical_and(np.isin(x.protein1, gene_list), np.isin(x.protein2, gene_list)), :]
+    G = nx.from_pandas_edgelist(gene_network_filt, source='protein1', target='protein2', edge_attr=True)
 
     G_cc = sorted(nx.connected_components(G), key=len, reverse=True)
     G_lcc = G.subgraph(G_cc[0])
 
     nx.to_pandas_edgelist(G_lcc).to_csv(config_dataset.data.path+"/STRING_human.tsv",sep='\t',index=False)
+
+    multi_omics = config_dataset.data.omics_data
+    for omics in multi_omics:
+        exp = pd.read_csv(multi_omics[omics],sep='\t',index_col=0)
+        common_genes = list(set(G_lcc.nodes).intersection(exp.columns))
+        exp_common = exp.loc[:,common_genes]
+        exp_common.to_csv(config_dataset.data.path+"/{}_Genefilt.tsv".format(omics),sep='\t')
 
     prepare_dataset(config_dataset, multi_omics=True)
     prepare_dataset(config_dataset, multi_omics=False)
