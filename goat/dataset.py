@@ -33,7 +33,7 @@ class patientDGL_multiomics(Dataset):
         
         patient = data[idx]
         patient['multiomics']: (n X k pd.DataFrame) k omics profile of n patients , where is n is the number of genes of interest
-        patient['label']: (str) categorical variable that indicates TMB-H/L group
+        patient['label']: (str) categorical variable that indicates patient label
         """
         topology_file = glob(data_dir+'/../STRING_*.tsv')
         self.topology = pd.read_csv(topology_file[0],sep='\t')
@@ -90,7 +90,7 @@ class patientDGL_singleomics(Dataset):
         
         patient = data[idx]
         patient['omics']: (n X 1 pd.DataFrame) omics profile of a patient, where is n is the number of genes of interest
-        patient['label']: (str) categorical variable that indicates TMB-H/L group
+        patient['label']: (str) categorical variable that indicates patient label
         """
         topology_file = glob(data_dir+'/../STRING_*.tsv')
         self.topology = pd.read_csv(topology_file[0],sep='\t')
