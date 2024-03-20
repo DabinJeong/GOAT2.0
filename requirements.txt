@@ -1,4 +1,5 @@
 torch
 dgl
 networkx
+ml-collections
 tensorboardX
