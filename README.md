@@ -15,7 +15,7 @@ conda update -n base -c defaults conda
 pip install --upgrade pip
 ~~~
 
-Install required pacakges.
+Install required packages.
 ~~~
 pip install -r requirements.txt
 ~~~
