@@ -6,36 +6,19 @@ import numpy as np
 import pickle
 import os
 
-def data_split(dataset, dict_patient_label, test_ratio=0.1, val_ratio=0.1):
-    common_samples = list(set(dataset.index).intersection(dict_patient_label.keys()))
-    dataset = dataset.loc[common_samples,:]
-    labels = list(dataset.index.map(lambda x:dict_patient_label[x]))
-    train_val_idx, test_idx = train_test_split(np.arange(len(dataset)), test_size=test_ratio, shuffle=True, stratify=labels)
-    train_idx, val_idx = train_test_split(train_val_idx, test_size=val_ratio, shuffle=True, stratify=[labels[idx] for idx in train_val_idx])
-
-    return train_idx, val_idx, test_idx
-
-def data_split_from_file(data_split_df, exp_df, crit):
+def data_split_from_file(data_split_df, samples_list, crit):
     target_samples = data_split_df.loc[lambda x:x[crit]==True,:].index
-    common_idx = list(set(target_samples).intersection(set(exp_df.index.map(lambda x:x[:-1]))))
-    sample_filt = exp_df.index.map(lambda x: True if x[:-1] in common_idx else False)
-    idx = exp_df.reset_index()[sample_filt]['index']
-    return idx
+    common_idx = list(set(target_samples).intersection(set(map(lambda x:x, samples_list))))
+    # sample_filt = list(map(lambda x: True if x in common_idx else False, samples_list))
+    return common_idx
 
-def data_split(dataset, dict_patient_label, test_ratio=0.1, val_ratio=0.1):
-    common_samples = list(set(dataset.index).intersection(dict_patient_label.keys()))
+def data_split(samples_list, dict_patient_label, test_ratio=0.1, val_ratio=0.1):
+    common_samples = list(set(samples_list).intersection(dict_patient_label.keys()))
     dataset = dataset.loc[common_samples,:]
-    labels = list(dataset.index.map(lambda x:dict_patient_label[x]))
+    labels = list(map(lambda x:dict_patient_label[x],samples_list))
     train_val_idx, test_idx = train_test_split(np.arange(len(dataset)), test_size=test_ratio, shuffle=True, stratify=labels)
     train_idx, val_idx = train_test_split(train_val_idx, test_size=val_ratio, shuffle=True, stratify=[labels[idx] for idx in train_val_idx])
     return train_idx, val_idx, test_idx
-
-def data_split_from_file(data_split_df, exp_df, crit):
-    target_samples = data_split_df.loc[lambda x:x[crit]==True,:].index
-    common_idx = list(set(target_samples).intersection(set(exp_df.index.map(lambda x:x[:-1]))))
-    sample_filt = exp_df.index.map(lambda x: True if x[:-1] in common_idx else False)
-    idx = exp_df.reset_index()[sample_filt]['index']
-    return idx
 
 def dataset_feature_scaling(df, train_idx, val_idx, test_idx):
     train_idx_common = list(set(train_idx).intersection(set(df.index)))

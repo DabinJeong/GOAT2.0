@@ -8,7 +8,7 @@ Here are the major updates in GOAT version 2.0
 ## Installation
 Create conda environment.
 ~~~
-conda create --name goat python=3.9
+conda create --name goat python=3.9.19
 conda activate goat
 
 conda update -n base -c defaults conda

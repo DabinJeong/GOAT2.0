@@ -1,5 +1,9 @@
-torch
-dgl
-networkx
-ml-collections
-tensorboardX
+torch==2.1.0
+pandas==2.2.2
+pydantic==2.7.0
+networkx==3.2.1
+scikit-learn==1.4.2
+ml-collections==0.1.1
+tensorboardX==2.6.2.1
+-f https://data.dgl.ai/wheels/cu121/repo.html
+dgl==2.0.0
