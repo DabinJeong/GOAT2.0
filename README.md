@@ -40,3 +40,16 @@ You can specify datasets and datasplits in `configs/tasks/*.yaml`.
 python ./demo/test_on_in_distribution_dataset.py -train True -modelConfig configs/models/model_GOAT.yaml -taskConfig configs/tasks/TCGA-LUAD_TMB.yaml -outDir result_test
 ~~~
 
+## Citation
+```
+@article{jeong2023goat,
+  title={GOAT: Gene-level biomarker discovery from multi-Omics data using graph ATtention neural network for eosinophilic asthma subtype},
+  author={Jeong, Dabin and Koo, Bonil and Oh, Minsik and Kim, Tae-Bum and Kim, Sun},
+  journal={Bioinformatics},
+  volume={39},
+  number={10},
+  pages={btad582},
+  year={2023},
+  publisher={Oxford University Press}
+}
+```
