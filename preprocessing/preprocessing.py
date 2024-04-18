@@ -76,9 +76,9 @@ def prepare_dataset(config, multi_omics=False):
             val_omics.append(val_omics_tmp)
             test_omics.append(test_omics_tmp)
 
-        df_2_list_pickle_multiomics(*train_omics, dict_patient_id, path=config.data.path+"train")
-        df_2_list_pickle_multiomics(*val_omics, dict_patient_id, path=config.data.path+"validation")
-        df_2_list_pickle_multiomics(*test_omics, dict_patient_id, path=config.data.path+"test")
+        df_2_list_pickle_multiomics(train_omics, dict_patient_id, path=config.data.path+"train")
+        df_2_list_pickle_multiomics(val_omics, dict_patient_id, path=config.data.path+"validation")
+        df_2_list_pickle_multiomics(test_omics, dict_patient_id, path=config.data.path+"test")
 
     return
 

@@ -56,17 +56,19 @@ def df_2_list_pickle(df, dict_patient_label, path):
         pickle.dump(li_GNNinput,f)
 
         
-def df_2_list_pickle_multiomics(df_exp, df_prot, dict_patient_label,path):
+def df_2_list_pickle_multiomics(df_omics, dict_patient_label,path):
+    joint_df = pd.concat(df_omics, axis=0, join='inner')
     if not os.path.exists(path):
         os.makedirs(path)
     li_GNNinput = []
-    for idx, row in enumerate(df_exp.index):
-        if row in df_exp.index and row in df_prot.index:
-            exp_tmp = df_exp.loc[[row],:]
-            prot_tmp = df_prot.loc[[row],:]
-            multiomics_tmp = pd.concat([exp_tmp, prot_tmp], axis=0)
-            multiomics_tmp.fillna(0, inplace=True)
-            li_GNNinput.append({'multiomics':multiomics_tmp, 'label':dict_patient_label[row]})
+    for idx, row in enumerate(joint_df.index):
+        li_omics = []
+        for omics in df_omics:
+            omics_tmp = omics.loc[[row],:]
+            li_omics.append(omics_tmp)
+        multiomics_tmp = pd.concat(li_omics, axis=0)
+        multiomics_tmp.fillna(0, inplace=True)
+        li_GNNinput.append({'multiomics':multiomics_tmp, 'label':dict_patient_label[row]})
 
     with open(path + "/multiomics.pickle",'wb') as f:
         pickle.dump(li_GNNinput,f)
