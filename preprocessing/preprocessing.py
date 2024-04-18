@@ -1,5 +1,6 @@
 import pandas as pd
 import networkx as nx
+import os
 from utils import *
 from glob import glob
 from ml_collections.config_dict import ConfigDict
@@ -33,7 +34,7 @@ def prepare_dataset(config, multi_omics=False):
     
     assert sum([True for omics in available_omics.keys() if available_omics[omics] is not None]) != 0, "No omics data found"
 
-    patient_id_file = glob(config.data.path+'Patient_label_*')[0]
+    patient_id_file = glob(config.data.patient_label)[0]
     dict_patient_id = pd.read_csv(patient_id_file, sep='\t',header=None,index_col=0).to_dict()[1]
 
     samples_common = list(set.intersection(*[set(available_omics[omics].index) for omics in available_omics.keys() if available_omics[omics] is not None]))
@@ -87,6 +88,9 @@ if __name__ == "__main__":
     parser.add_argument("-taskConfig")
     args = parser.parse_args()
     config_dataset = ConfigDict(yaml.load(open(args.taskConfig,'r'), yaml.FullLoader))
+
+    if os.path.isdir(config_dataset.data.path) == False:
+        os.makedirs(config_dataset.data.path)
 
     gene_network = pd.read_csv(config_dataset.data.gene_network, sep='\t')
     with open(config_dataset.data.gene_list) as f:
