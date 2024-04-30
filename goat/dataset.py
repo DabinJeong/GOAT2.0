@@ -149,7 +149,7 @@ class OmicsDataset_singleomics(Dataset):
 class OmicsDataset_multiomics(Dataset):
     def __init__(self, data_dir):
         self.dataset = patientDGL_multiomics(data_dir)
-        self.dataset.num_nodes = self.dataset.num_nodes
+        self.num_nodes = self.dataset.num_nodes
 
     def _add_positional_encoding(self, pos_enc_dim):
         transform = RandomWalkPE(k=pos_enc_dim, feat_name='pos_enc')
