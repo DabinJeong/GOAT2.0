@@ -61,7 +61,7 @@ def df_2_list_pickle_multiomics(df_omics, dict_patient_label,path):
     if not os.path.exists(path):
         os.makedirs(path)
     li_GNNinput = []
-    for idx, row in enumerate(joint_df.index):
+    for idx, row in enumerate(set(joint_df.index)):
         li_omics = []
         for omics in df_omics:
             omics_tmp = omics.loc[[row],:]
